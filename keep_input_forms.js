@@ -11,22 +11,41 @@
 /* jshint -W097 */
 'use strict';
 
-// Your code here...
-
-var input_elems = document.getElementsByTagName("input");
-console.log(input_elems)
-for (var key in input_elems) {
-    var elem;
-    elem = input_elems[key];
-    if (localStorage[elem.id]) {
-        elem.value = localStorage[elem.id];
-        console.log(localStorage[elem.id]);
-    }
-    if (typeof elem === "object") {
-        elem.onchange = function () {
-            var tmp = this.value;
-            var id = this.id;
-            localStorage.setItem(id, tmp);
-        }
-    }
+function addJQuery(callback) {
+    var script = document.createElement("script");
+    script.setAttribute("src", "//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js");
+    script.addEventListener('load', function() {
+        var script = document.createElement("script");
+        script.textContent = "window.jQ=jQuery.noConflict(true);(" + callback.toString() + ")();";
+        document.body.appendChild(script);
+    }, false);
+    document.body.appendChild(script);
 }
+
+addJQuery(function () {
+    jQ(function () {
+        if (document.activeElement) {
+            field = jQ(document.activeElement);
+            field.change(function () {
+                var tmp = field.val();
+                var id = field.attr('id');
+                //localStorage.setItem(id, tmp);
+                console.log('logged' + tmp);
+            });
+        }
+        jQ("input, textarea").focus(function() {
+            field = jQ(document.activeElement);
+            console.log('here');
+            if (localStorage[field.attr('id')]) {
+                //field.val(localStorage[field.attr('id')]); //add button or print to console? keep history in cookie?
+                console.log('recorvering ' + localStorage[field.attr('id')]);
+            }
+                field.change(function () {
+                    var tmp = field.val();
+                    var id = field.attr('id');
+                    localStorage.setItem(id, tmp);
+                    console.log('logged ' + tmp);
+                });
+        });
+    });
+});
